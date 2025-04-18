@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Owner Archetype Assessment</title>
+    <title>ToolMan Archetype</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body { 
@@ -263,6 +263,7 @@
             cursor: pointer;
             padding: 10px;
             z-index: 100;
+            display: none;
         }
         .menu-button span {
             display: block;
@@ -279,6 +280,9 @@
             padding: 20px;
             box-sizing: border-box;
         }
+        .roster-page .menu-button {
+            display: none;  /* Hide hamburger when in roster view */
+        }
         .roster-content {
             max-width: 800px;
             margin: 0 auto;
@@ -288,6 +292,9 @@
             text-align: center;
             margin: 20px 0;
             font-size: 24px;
+        }
+        .client-mode .roster-content h2 {
+            display: none;  /* Hide roster heading in client mode */
         }
         .client-card {
             padding: 15px;
@@ -462,6 +469,7 @@
             cursor: pointer;
             padding: 10px;
             z-index: 100;
+            transition: 0.3s;
         }
         .mode-toggle span {
             display: block;
@@ -609,6 +617,29 @@
                 margin: 0;
                 padding: 15px 0;
             }
+        }
+        /* Client-admin mode styles */
+        .client-admin-mode .mode-toggle span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+            background-color: #666;
+        }
+        .client-admin-mode .mode-toggle span:nth-child(2) {
+            opacity: 0;
+            background-color: #666;
+        }
+        .client-admin-mode .mode-toggle span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+            background-color: #666;
+        }
+        /* Client mode styles */
+        .client-mode .mode-toggle span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        .client-mode .mode-toggle span:nth-child(2) {
+            opacity: 0;
+        }
+        .client-mode .mode-toggle span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
         }
     </style>
 </head>
@@ -794,7 +825,15 @@
         
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Set up initial points
+            // Restore the correct mode
+            const savedMode = localStorage.getItem('mode');
+            if (savedMode === 'client-admin') {
+                document.body.classList.add('client-admin-mode');
+            } else if (savedMode === 'client') {
+                document.body.classList.add('client-mode');
+            }
+            
+            // Initialize points
             window.points = {
                 style: 0,
                 speed: 0,
@@ -814,17 +853,6 @@
             // Hide assessment view by default
             document.getElementById('assessmentView').classList.remove('active');
             document.getElementById('rosterPage').style.display = 'block';
-
-            // Check for saved mode
-            isClientMode = localStorage.getItem('isClientMode') === 'true';
-            currentClientName = localStorage.getItem('currentClientName') || '';
-            
-            if (isClientMode) {
-                document.body.classList.add('client-mode');
-                if (currentClientName) {
-                    showClientView(currentClientName);
-                }
-            }
         });
 
         function setupEventListeners() {
@@ -1392,16 +1420,27 @@
         }
 
         function toggleMode() {
-            isClientMode = !isClientMode;
-            localStorage.setItem('isClientMode', isClientMode);
+            const body = document.body;
             
-            if (isClientMode) {
-                document.body.classList.add('client-mode');
+            // If in admin mode, switch to client-admin mode
+            if (!body.classList.contains('client-mode') && !body.classList.contains('client-admin-mode')) {
+                body.classList.add('client-admin-mode');
+                localStorage.setItem('mode', 'client-admin');
                 document.getElementById('assessmentView').classList.remove('active');
                 currentClientName = '';
                 localStorage.removeItem('currentClientName');
-            } else {
-                document.body.classList.remove('client-mode');
+            }
+            // If in client-admin mode, switch to client mode
+            else if (body.classList.contains('client-admin-mode')) {
+                body.classList.remove('client-admin-mode');
+                body.classList.add('client-mode');
+                localStorage.setItem('mode', 'client');
+                document.getElementById('assessmentView').classList.remove('active');
+            }
+            // If in client mode, switch back to admin mode
+            else {
+                body.classList.remove('client-mode');
+                localStorage.setItem('mode', 'admin');
                 document.getElementById('assessmentView').classList.add('active');
                 startNewTest();
             }
