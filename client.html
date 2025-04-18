@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Owner Archetype Assessment</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 10px; 
+            position: relative;
+        }
+        h1 { 
+            text-align: center;
+            margin: 10px 0 40px 0;
+            font-size: 36px;
+        }
+        h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        p {
+            margin: 2px 0 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .category { 
+            margin-bottom: 12px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .bubble-container { 
+            display: flex; 
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .bubble {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: white;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        .bubble.selected { 
+            border: 1px solid transparent;
+        }
+        .bubble.selected[data-value="0"] { 
+            background-color: #f2f2f2;
+        }
+        .bubble.selected[data-value="1"] { 
+            background-color: #d9d9d9;
+        }
+        .bubble.selected[data-value="2"] { 
+            background-color: #b3b3b3;
+        }
+        .bubble.selected[data-value="3"] { 
+            background-color: #808080;
+        }
+        .bubble.selected[data-value="4"] { 
+            background-color: #4d4d4d;
+        }
+        .bubble.selected[data-value="5"] { 
+            background-color: #1a1a1a;
+        }
+        #counter {
+            text-align: center;
+            font-weight: bold;
+            margin: 25px 0 10px 0;
+            font-size: 14px;
+            padding: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #counter.complete {
+            border-color: #4CAF50;
+        }
+        #counter.over {
+            border-color: #f44336;
+        }
+        #counter .current-points {
+            transition: color 0.3s ease;
+        }
+        #counter.over .current-points {
+            color: #f44336;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 8px;
+            flex: 1;
+            border: none;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        #calculateBtn:not(:disabled) {
+            background-color: #000;
+            color: white;
+        }
+        .hidden {
+            display: none;
+        }
+        #resultView {
+            margin-top: 25px;
+        }
+        #resultView > div {
+            margin: 0 120px;
+            padding: 30px 0;
+        }
+        .summary-section {
+            padding: 0 0 40px 0;
+        }
+        #archetypeTitle {
+            text-align: center;
+            font-size: 32px;
+            margin: 0 0 8px 0;
+            font-weight: bold;
+        }
+        #archetypeTagline {
+            font-style: italic;
+            margin: 0;
+            color: #666;
+            text-align: center;
+        }
+        #archetypeDescription {
+            margin: 40px 0 20px 0;
+            color: #666;
+            line-height: 1.5;
+        }
+        .summary-section div {
+            margin: 25px 0 0 0;
+            padding: 20px 0 0 0;
+            border-top: 1px solid #ddd;
+        }
+        .summary-section div h3 {
+            margin-bottom: 12px;
+        }
+        .summary-section div p {
+            line-height: 1.5;
+        }
+        .saved-info {
+            margin: 30px 120px 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            display: none;
+        }
+        .saved-info.active {
+            display: block;
+        }
+        .saved-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            font-size: 14px;
+        }
+        .saved-info-item {
+            text-align: center;
+        }
+        .saved-info-label {
+            color: #666;
+            margin-bottom: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .saved-info-value {
+            color: #000;
+            font-weight: 500;
+        }
+        .new-test-button {
+            display: block;
+            width: 200px;
+            margin: 0 auto 30px;
+            padding: 10px 20px;
+            background-color: #000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .new-test-button:hover {
+            background-color: #333;
+        }
+        .profile-history {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .profile-history h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 18px;
+        }
+        .saved-tests {
+            margin-top: 20px;
+        }
+        .client-card {
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 10px;
+            transition: background-color 0.2s ease;
+        }
+        .client-card:hover {
+            background-color: #f0f0f0;
+        }
+        .client-card p {
+            flex: 1;
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .client-card h4 {
+            flex: 1;
+            margin: 0;
+            font-size: 16px;
+        }
+        .client-card .date {
+            width: 100px;
+            text-align: right;
+            flex: none;
+        }
+        .menu-button {
+            display: none;
+        }
+        .client-welcome {
+            text-align: center;
+            margin: 40px 0;
+            display: block;
+        }
+        .client-name-input {
+            text-align: center;
+            margin: 20px 0 40px;
+            display: block;
+        }
+        .client-name-input input {
+            padding: 8px 16px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 300px;
+            margin-right: 10px;
+        }
+        .client-name-input button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .client-name-input button:hover {
+            background: #333;
+        }
+        .assessment-area {
+            display: none;
+        }
+        .assessment-area.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="client-mode">
+    <h1>Owner Archetype Assessment</h1>
+
+    <div class="client-welcome">
+        <h2>Welcome to the Owner Archetype Assessment</h2>
+        <p>Please enter your name to begin or continue your assessment journey.</p>
+    </div>
+
+    <div class="client-name-input">
+        <input type="text" id="clientModeInput" placeholder="Enter your name">
+        <button onclick="setClientName()">Continue</button>
+    </div>
+
+    <div id="assessmentView" class="assessment-area">
+        <div class="category">
+            <div>
+                <h3>Style & Quality</h3>
+                <p>Importance of appearance</p>
+            </div>
+            <div class="bubble-container" id="style-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <div>
+                <h3>Speed & Turnaround</h3>
+                <p>How quickly project completes</p>
+            </div>
+            <div class="bubble-container" id="speed-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <div>
+                <h3>Budget Awareness</h3>
+                <p>Concern for costs</p>
+            </div>
+            <div class="bubble-container" id="budget-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <div>
+                <h3>Longevity & Durability</h3>
+                <p>How long solution needs to last</p>
+            </div>
+            <div class="bubble-container" id="longevity-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <div>
+                <h3>Control & Involvement</h3>
+                <p>Client participation desired</p>
+            </div>
+            <div class="bubble-container" id="control-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <div>
+                <h3>Life Load & Complexity</h3>
+                <p>Household activity level</p>
+            </div>
+            <div class="bubble-container" id="lifeload-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+
+        <div id="counter">Points: <span class="current-points">0</span>/18</div>
+        
+        <div class="buttons">
+            <button>Reset</button>
+            <button id="calculateBtn" disabled>Calculate</button>
+        </div>
+
+        <div id="resultView" class="hidden">
+            <div class="saved-info" id="savedInfo">
+                <div class="saved-info-grid">
+                    <div class="saved-info-item">
+                        <div class="saved-info-label">Test Date</div>
+                        <div class="saved-info-value" id="savedDate">--</div>
+                    </div>
+                    <div class="saved-info-item">
+                        <div class="saved-info-label">Client Name</div>
+                        <div class="saved-info-value" id="savedClientName">--</div>
+                    </div>
+                    <div class="saved-info-item">
+                        <div class="saved-info-label">Archetype Result</div>
+                        <div class="saved-info-value" id="savedProfileId">--</div>
+                    </div>
+                </div>
+            </div>
+            <div class="summary-section">
+                <h3 id="archetypeTitle"></h3>
+                <p id="archetypeTagline"></p>
+                <p id="archetypeDescription"></p>
+                <div>
+                    <h3>How to Work With This Type:</h3>
+                    <p id="archetypeAdvice"></p>
+                </div>
+            </div>
+            <div class="profile-history" id="profileHistory">
+                <button class="new-test-button" onclick="startNewTest()">New Test</button>
+                <h3>Client Test History</h3>
+                <div class="saved-tests" id="savedTests"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentClientName = '';
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize points
+            window.points = {
+                style: 0,
+                speed: 0,
+                budget: 0,
+                longevity: 0,
+                control: 0,
+                lifeload: 0
+            };
+            window.totalPoints = 0;
+            
+            // Set up event listeners for bubbles
+            document.querySelectorAll('.bubble').forEach(bubble => {
+                bubble.addEventListener('click', function() {
+                    const category = this.closest('.bubble-container').id.replace('-bubbles', '');
+                    const value = parseInt(this.getAttribute('data-value'));
+                    selectBubble(category, value, this);
+                });
+            });
+
+            // Set up event listener for reset button
+            document.querySelector('.buttons button:first-child').addEventListener('click', resetAll);
+            
+            // Set up event listener for calculate button
+            document.getElementById('calculateBtn').addEventListener('click', calculate);
+
+            // Check for returning client
+            currentClientName = localStorage.getItem('currentClientName') || '';
+            if (currentClientName) {
+                showClientView(currentClientName);
+            }
+        });
+
+        function selectBubble(category, value, clickedBubble) {
+            const container = document.getElementById(category + '-bubbles');
+            const bubbles = container.getElementsByClassName('bubble');
+            const wasSelected = clickedBubble.classList.contains('selected');
+            
+            const oldValue = window.points[category] || 0;
+            const newValue = wasSelected ? 0 : value;
+            window.points[category] = newValue;
+            window.totalPoints = window.totalPoints - oldValue + newValue;
+            
+            Array.from(bubbles).forEach(bubble => {
+                if (parseInt(bubble.getAttribute('data-value')) <= newValue) {
+                    bubble.classList.add('selected');
+                } else {
+                    bubble.classList.remove('selected');
+                }
+            });
+            
+            if (wasSelected) {
+                clickedBubble.classList.remove('selected');
+            }
+            
+            const counterElement = document.getElementById('counter');
+            counterElement.innerHTML = `Points: <span class="current-points">${window.totalPoints}</span>/18`;
+            
+            counterElement.classList.remove('complete', 'over');
+            if (window.totalPoints === 18) {
+                counterElement.classList.add('complete');
+            } else if (window.totalPoints > 18) {
+                counterElement.classList.add('over');
+            }
+            
+            document.getElementById('calculateBtn').disabled = (window.totalPoints !== 18);
+        }
+
+        function resetAll() {
+            Object.keys(window.points).forEach(category => {
+                window.points[category] = 0;
+            });
+            window.totalPoints = 0;
+            
+            document.querySelectorAll('.bubble').forEach(bubble => {
+                bubble.classList.remove('selected');
+            });
+            
+            const counterElement = document.getElementById('counter');
+            counterElement.innerHTML = `Points: <span class="current-points">0</span>/18`;
+            counterElement.classList.remove('complete', 'over');
+            
+            document.getElementById('calculateBtn').disabled = true;
+            document.getElementById('resultView').classList.add('hidden');
+            document.getElementById('savedInfo').classList.remove('active');
+            document.getElementById('profileHistory').style.display = 'none';
+        }
+
+        function calculate() {
+            const archetypeId = determineArchetype();
+            displayArchetype(archetypeId);
+            
+            document.getElementById('resultView').classList.remove('hidden');
+            
+            // Auto-save the result
+            if (currentClientName) {
+                saveClient();
+            }
+        }
+
+        function determineArchetype() {
+            let points = window.points;
+            
+            const zeroCount = Object.values(points).filter(val => val === 0).length;
+            const fiveCount = Object.values(points).filter(val => val === 5).length;
+            
+            if (zeroCount >= 2 || fiveCount >= 3) {
+                return 'trickster';
+            }
+            
+            if (Object.values(points).every(val => val >= 2 && val <= 4)) {
+                return 'standard-owner';
+            }
+            
+            const entries = Object.entries(points).sort((a, b) => b[1] - a[1]);
+            
+            if (entries[0][1] >= 4) {
+                const highestCategory = entries[0][0];
+                const highestValue = entries[0][1];
+                
+                if (highestCategory === 'style' && highestValue === 5) {
+                    return 'host';
+                } else if (highestCategory === 'speed' && highestValue >= 4) {
+                    return 'busy-owner';
+                } else if (highestCategory === 'longevity' && highestValue >= 4) {
+                    if (points.control >= 4) {
+                        return 'craftsman';
+                    }
+                    return 'champion-owner';
+                } else if (highestCategory === 'control' && highestValue >= 4) {
+                    return 'home-partner';
+                } else if (highestCategory === 'lifeload' && highestValue >= 4) {
+                    return 'family-home';
+                }
+            }
+            
+            if (points.control >= 3 && points.longevity >= 3) {
+                return 'steward';
+            }
+            
+            if (points.speed <= 1 && points.longevity >= 4) {
+                return 'strategist';
+            }
+            
+            if (points.style <= 2 && points.budget >= 3 && points.longevity >= 3) {
+                return 'respected-homeowner';
+            }
+            
+            return 'learner';
+        }
+
+        function displayArchetype(archetypeId) {
+            const archetypes = {
+                'learner': {
+                    name: `The Learner`,
+                    description: `Curious, thoughtful, and eager to understand. They value learning, want to be part of the process, and are beginning to care more intentionally for their home. They aren't trying to control the work—they just want to understand it.`,
+                    tagline: `Help me understand how this all works.`,
+                    advice: `Take time to explain. Be transparent, patient, and educational. Build their trust through clarity and a sense of progress.`
+                },
+                'busy-owner': {
+                    name: `The Busy Owner`,
+                    description: `They're juggling too much to care about details. They need problems off their plate fast—and they'll gladly pay if you relieve the pressure. You might get short replies and forgotten follow-ups, but it's not personal.`,
+                    tagline: `I just need this done—fast and right.`,
+                    advice: `Offer a turnkey solution. Keep communication brief and focused. Be direct, and don't overexplain.`
+                },
+                'steward': {
+                    name: `The Steward`,
+                    description: `They're on the path to being a long-term homeowner. They want to do things right, but they're still learning how. They value durability and involvement, and want to grow alongside their home.`,
+                    tagline: `Let's build a plan I can follow.`,
+                    advice: `Walk beside them. Break down your approach into steps and educate without overwhelming. They'll become loyal if you give them confidence.`
+                },
+                'family-home': {
+                    name: `The Family Home`,
+                    description: `This home is busy, loud, and lived in. Kids, pets, work schedules—they're juggling everything. Cost and timing matter, but so does safety. They're not upgrading—they're surviving.`,
+                    tagline: `We need to keep things from falling apart.`,
+                    advice: `Be flexible. Provide practical, low-disruption solutions. Offer smart prioritization that fits their life rhythm.`
+                },
+                'home-partner': {
+                    name: `The Home Partner`,
+                    description: `You're their teammate—not just a service provider. They trust your insight and want to build a long-term relationship. They'll ask for updates, but not because they doubt you—because they care.`,
+                    tagline: `Let's make this home better together.`,
+                    advice: `Treat them like a co-pilot. Communicate regularly, offer future planning, and build rituals of care.`
+                },
+                'strategist': {
+                    name: `The Strategist`,
+                    description: `They want durability, ROI, and clarity. They're planners, not reactors. They'll ask questions not to challenge you, but to make the smartest decision.`,
+                    tagline: `I want it done once and done right.`,
+                    advice: `Speak in logic and trade-offs. Lay out the future impact of decisions. Respect their timeline and give layered options.`
+                },
+                'respected-homeowner': {
+                    name: `The Respected Homeowner`,
+                    description: `Practical, even-tempered, and grounded. They don't want flash—they want reliability. Their goal is peace of mind, not perfection.`,
+                    tagline: `Keep it working, keep it simple.`,
+                    advice: `Be straight with them. Avoid over-designing. Prioritize long-term maintenance and functional wins.`
+                },
+                'craftsman': {
+                    name: `The Craftsman`,
+                    description: `Often a retired tradesperson or experienced DIYer. They know what good work looks like. They're not hands-off—they're just not doing it anymore.`,
+                    tagline: `Do it right or don't do it at all.`,
+                    advice: `Skip fluff. Get to the point. Do your best work, or don't take the job. They'll know if you're faking it.`
+                },
+                'host': {
+                    name: `The Host`,
+                    description: `Their home is where people gather. Flow, mood, and finish matter more than longevity or budget. They may splurge where others wouldn't.`,
+                    tagline: `I want this place to feel amazing.`,
+                    advice: `Respect their eye. Recommend beautiful materials and presentation. Help shape the guest experience.`
+                },
+                'champion-owner': {
+                    name: `The Champion Owner`,
+                    description: `Your ideal client. They value you, trust you, and promote you. They want premium care and lasting solutions—but won't micromanage.`,
+                    tagline: `You're my guy. What do we do next?`,
+                    advice: `Keep them close. Overdeliver. Offer loyalty perks, previews, or updates. These are your legacy builders.`
+                },
+                'standard-owner': {
+                    name: `The Standard Owner`,
+                    description: `Balanced and clear-minded. They care—but not obsessively. They're thoughtful and easy to work with.`,
+                    tagline: `I want good work, good timing, and good value.`,
+                    advice: `Treat them with consistency and respect. Don't over-customize—just stay dependable.`
+                },
+                'trickster': {
+                    name: `The Trickster`,
+                    description: `Their input is unclear, conflicting, or emotionally inconsistent. They may not know what they want—or they change their mind halfway through.`,
+                    tagline: `Oh… I didn't really think about that.`,
+                    advice: `Set tight scope. Reconfirm every agreement. Use writing, visuals, and small phases. Clarify before building.`
+                }
+            };
+            
+            const archetype = archetypes[archetypeId];
+            
+            document.getElementById('archetypeTitle').textContent = archetype.name;
+            document.getElementById('archetypeTagline').textContent = archetype.tagline;
+            document.getElementById('archetypeDescription').textContent = archetype.description;
+            document.getElementById('archetypeAdvice').textContent = archetype.advice;
+        }
+
+        function saveClient() {
+            const clientData = {
+                name: currentClientName,
+                archetype: document.getElementById('archetypeTitle').textContent,
+                points: { ...window.points },
+                date: new Date().toLocaleDateString(),
+                timestamp: Date.now()
+            };
+
+            let savedClients = JSON.parse(localStorage.getItem('clients') || '[]');
+            savedClients.push(clientData);
+            localStorage.setItem('clients', JSON.stringify(savedClients));
+
+            const clientTests = savedClients.filter(test => test.name === currentClientName)
+                                         .sort((a, b) => b.timestamp - a.timestamp);
+
+            document.getElementById('counter').style.display = 'none';
+            document.querySelector('.buttons').style.display = 'none';
+
+            const savedInfo = document.getElementById('savedInfo');
+            savedInfo.classList.add('active');
+            document.getElementById('savedProfileId').textContent = clientData.archetype || '--';
+            document.getElementById('savedClientName').textContent = clientData.name || '--';
+            document.getElementById('savedDate').textContent = clientData.date || '--';
+
+            displayClientHistory(clientTests);
+            scrollToTop();
+        }
+
+        function displayClientHistory(tests) {
+            const historyDiv = document.getElementById('profileHistory');
+            const savedTestsDiv = document.getElementById('savedTests');
+
+            if (tests && tests.length > 0) {
+                historyDiv.style.display = 'block';
+                savedTestsDiv.innerHTML = tests.map((test, index) => `
+                    <div class="client-card">
+                        <p>${test.archetype}</p>
+                        <h4>${test.name}</h4>
+                        <p class="date">${test.date}</p>
+                    </div>
+                `).join('');
+
+                const cards = savedTestsDiv.querySelectorAll('.client-card');
+                cards.forEach((card, index) => {
+                    card.addEventListener('click', () => loadClientTest(tests[index]));
+                });
+            } else {
+                historyDiv.style.display = 'none';
+            }
+        }
+
+        function loadClientTest(test) {
+            resetAll();
+            
+            Object.entries(test.points).forEach(([category, value]) => {
+                window.points[category] = value;
+                const bubbles = document.querySelectorAll(`#${category}-bubbles .bubble`);
+                bubbles.forEach((bubble, i) => {
+                    if (i < value) {
+                        bubble.classList.add('selected');
+                    }
+                });
+            });
+
+            window.totalPoints = Object.values(test.points).reduce((a, b) => a + b, 0);
+
+            document.getElementById('counter').style.display = 'none';
+            document.querySelector('.buttons').style.display = 'none';
+
+            const savedInfo = document.getElementById('savedInfo');
+            savedInfo.classList.add('active');
+            document.getElementById('savedProfileId').textContent = test.archetype || '--';
+            document.getElementById('savedClientName').textContent = test.name || '--';
+            document.getElementById('savedDate').textContent = test.date || '--';
+
+            const archetypeId = determineArchetype();
+            displayArchetype(archetypeId);
+
+            document.getElementById('resultView').classList.remove('hidden');
+
+            const clients = JSON.parse(localStorage.getItem('clients') || '[]');
+            const clientTests = clients.filter(t => t.name === test.name)
+                                    .sort((a, b) => b.timestamp - a.timestamp);
+            displayClientHistory(clientTests);
+
+            scrollToTop();
+        }
+
+        function setClientName() {
+            const nameInput = document.getElementById('clientModeInput');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            currentClientName = name;
+            localStorage.setItem('currentClientName', name);
+            showClientView(name);
+        }
+
+        function showClientView(clientName) {
+            document.getElementById('assessmentView').classList.add('active');
+            
+            const clients = JSON.parse(localStorage.getItem('clients') || '[]');
+            const clientTests = clients.filter(test => test.name === clientName)
+                                    .sort((a, b) => b.timestamp - a.timestamp);
+            
+            if (clientTests.length > 0) {
+                loadClientTest(clientTests[0]);
+            } else {
+                startNewTest();
+            }
+        }
+
+        function startNewTest() {
+            resetAll();
+            
+            document.getElementById('counter').style.display = 'block';
+            document.querySelector('.buttons').style.display = 'flex';
+            document.getElementById('savedInfo').classList.remove('active');
+            document.getElementById('resultView').classList.add('hidden');
+            document.getElementById('profileHistory').style.display = 'none';
+            document.getElementById('assessmentView').classList.add('active');
+            
+            scrollToTop();
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            document.getElementById('assessmentView').focus();
+        }
+    </script>
+</body>
+</html> 

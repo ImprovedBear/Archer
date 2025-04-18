@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Icons</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        canvas {
+            display: block;
+            margin: 20px 0;
+            border: 1px solid #eee;
+        }
+        .icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .icon-container {
+            text-align: center;
+        }
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #333;
+            text-decoration: none;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Icon Generator for ToolMan Client Archetype</h1>
+        <p>Click the button below to generate PNG icons from the SVG file.</p>
+        
+        <button id="generate">Generate Icons</button>
+        
+        <div class="icons">
+            <div class="icon-container">
+                <h3>192×192 Icon</h3>
+                <canvas id="canvas192" width="192" height="192"></canvas>
+                <a id="download192" href="#" download="icon.png">Download</a>
+            </div>
+            
+            <div class="icon-container">
+                <h3>512×512 Icon</h3>
+                <canvas id="canvas512" width="512" height="512"></canvas>
+                <a id="download512" href="#" download="icon-512.png">Download</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('generate').addEventListener('click', generateIcons);
+
+        function generateIcons() {
+            const svgURL = 'icon.svg';
+            
+            // Generate 192×192 icon
+            generateIcon(svgURL, 192, 'canvas192', 'download192');
+            
+            // Generate 512×512 icon
+            generateIcon(svgURL, 512, 'canvas512', 'download512');
+        }
+
+        function generateIcon(svgURL, size, canvasId, downloadId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = function() {
+                ctx.clearRect(0, 0, size, size);
+                ctx.drawImage(img, 0, 0, size, size);
+                
+                const downloadLink = document.getElementById(downloadId);
+                downloadLink.href = canvas.toDataURL('image/png');
+            };
+            
+            img.src = svgURL;
+        }
+    </script>
+</body>
+</html> 

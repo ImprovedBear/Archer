@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Owner Archetype</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 10px; 
+            position: relative;  /* For absolute positioning of menu button */
+        }
+        h1 { 
+            text-align: center;
+            margin: 10px 0 40px 0;  /* Increased bottom margin to 40px */
+            font-size: 36px;  /* Optional: made title slightly larger */
+        }
+        h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        p {
+            margin: 2px 0 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .category { 
+            margin-bottom: 12px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .bubble-container { 
+            display: flex; 
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .bubble {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: white;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        .bubble.selected { 
+            border: 1px solid transparent;  /* All selected states have no outline */
+        }
+        .bubble.selected[data-value="0"] { 
+            background-color: #f2f2f2;
+        }
+        .bubble.selected[data-value="1"] { 
+            background-color: #d9d9d9;
+        }
+        .bubble.selected[data-value="2"] { 
+            background-color: #b3b3b3;
+        }
+        .bubble.selected[data-value="3"] { 
+            background-color: #808080;
+        }
+        .bubble.selected[data-value="4"] { 
+            background-color: #4d4d4d;
+        }
+        .bubble.selected[data-value="5"] { 
+            background-color: #1a1a1a;
+        }
+        #counter {
+            text-align: center;
+            font-weight: bold;
+            margin: 25px 0 10px 0;
+            font-size: 14px;
+            padding: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #counter.complete {
+            border-color: #4CAF50;  /* Green border for exactly 18 points */
+        }
+        #counter.over {
+            border-color: #f44336;  /* Red border for over 18 points */
+        }
+        #counter .current-points {
+            transition: color 0.3s ease;
+        }
+        #counter.over .current-points {
+            color: #f44336;  /* Red text for points when over 18 */
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 8px;
+            flex: 1;
+            border: none;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        #calculateBtn:not(:disabled) {
+            background-color: #000;
+            color: white;
+        }
+        .hidden {
+            display: none;
+        }
+        #resultView {
+            margin-top: 25px;
+        }
+        #resultView > div {
+            margin: 0 120px;  /* Apply indentation to the entire results section */
+            padding: 30px 0;
+        }
+        .summary-section {
+            padding: 0 0 40px 0;
+        }
+        #archetypeTitle {
+            text-align: center;
+            font-size: 32px;
+            margin: 0 0 8px 0;  /* Reduced bottom margin to bring tagline closer */
+            font-weight: bold;
+        }
+        #archetypeTagline {
+            font-style: italic;
+            margin: 0;  /* Removed vertical margins */
+            color: #666;
+            text-align: center;
+        }
+        #archetypeDescription {
+            margin: 40px 0 20px 0;  /* Increased top margin to create separation */
+            color: #666;
+            line-height: 1.5;
+        }
+        .summary-section div {
+            margin: 25px 0 0 0;
+            padding: 20px 0 0 0;
+            border-top: 1px solid #ddd;
+        }
+        .summary-section div h3 {
+            margin-bottom: 12px;
+        }
+        .summary-section div p {
+            line-height: 1.5;
+        }
+        .save-section {
+            margin: 20px 0 0 0;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .save-section input {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 200px;
+        }
+        .save-button {
+            background-color: #000;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .client-roster {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .client-roster h3 {
+            margin-bottom: 15px;
+        }
+        .saved-clients {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .client-card {
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            transition: background-color 0.2s ease;
+            user-select: none;  /* Prevent text selection when clicking */
+        }
+        .client-card:hover {
+            background-color: #f0f0f0;
+        }
+        .client-card p {
+            flex: 1;
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .client-card h4 {
+            flex: 1;
+            margin: 0;
+            font-size: 16px;
+        }
+        .client-card .date {
+            width: 100px;
+            text-align: right;
+            flex: none;
+        }
+        .client-card .actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            z-index: 2;  /* Ensure buttons are above the clickable area */
+        }
+        .client-card .action-btn {
+            background: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 6px 12px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .client-card .action-btn:hover {
+            background: #333;
+        }
+        .client-card .action-btn.delete {
+            background: #000;
+            color: #fff;
+        }
+        .client-card .action-btn.delete:hover {
+            background: #333;
+        }
+        .edit-mode .client-name {
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .menu-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 100;
+        }
+        .menu-button span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background-color: #000;
+            margin: 5px 0;
+            transition: 0.3s;
+        }
+        .roster-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 90;
+            padding: 20px;
+            box-sizing: border-box;
+            display: none;
+            overflow-y: auto;
+        }
+        .roster-page.active {
+            display: block;
+        }
+        .roster-page h2 {
+            text-align: center;
+            margin: 40px 0 20px;
+        }
+        .roster-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .close-button {
+            display: none;  /* Hide the close button */
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .modal-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .modal-button.confirm {
+            background-color: #ff4444;
+            color: white;
+        }
+        .modal-button.cancel {
+            background-color: #f0f0f0;
+        }
+        .saved-info {
+            margin: 30px 120px 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            display: none;  /* Hidden by default */
+        }
+        .saved-info.active {
+            display: block;
+        }
+        .saved-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            font-size: 14px;
+        }
+        .saved-info-item {
+            text-align: center;
+        }
+        .saved-info-label {
+            color: #666;
+            margin-bottom: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .saved-info-value {
+            color: #000;
+            font-weight: 500;
+        }
+        .new-test-button {
+            display: block;
+            width: 200px;
+            margin: 0 auto 30px;
+            padding: 10px 20px;
+            background-color: #000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .new-test-button:hover {
+            background-color: #333;
+        }
+        .profile-history {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .profile-history h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 18px;
+        }
+        .saved-tests {
+            margin-top: 20px;
+        }
+        .edit-mode.client-name {
+            padding: 4px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            font-family: inherit;
+            width: 200px;
+            margin: -4px 0;
+        }
+        .edit-mode.client-name:focus {
+            outline: none;
+            border-color: #000;
+        }
+        .mode-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 100;
+        }
+        .mode-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background-color: #000;
+            margin: 5px 0;
+            transition: 0.3s;
+        }
+        .client-mode .menu-button {
+            display: none;
+        }
+        .client-mode .mode-toggle span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        .client-mode .mode-toggle span:nth-child(2) {
+            opacity: 0;
+        }
+        .client-mode .mode-toggle span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+        .client-welcome {
+            text-align: center;
+            margin: 40px 0;
+            display: none;
+        }
+        .client-mode .client-welcome {
+            display: block;
+        }
+        .client-name-input {
+            text-align: center;
+            margin: 20px 0 40px;
+            display: none;
+        }
+        .client-mode .client-name-input {
+            display: block;
+        }
+        .client-name-input input {
+            padding: 8px 16px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 300px;
+            margin-right: 10px;
+        }
+        .client-name-input button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .client-name-input button:hover {
+            background: #333;
+        }
+        .assessment-area {
+            display: none;
+        }
+        .assessment-area.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <button class="mode-toggle" onclick="toggleMode()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <button class="menu-button" onclick="toggleRoster()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="roster-page" id="rosterPage">
+        <div class="roster-content">
+            <h2>Client Roster</h2>
+            <button class="new-test-button" onclick="startNewTest()">New Test</button>
+            <div class="saved-clients" id="rosterClients"></div>
+        </div>
+    </div>
+
+    <h1>Owner Archetype</h1>
+
+    <div class="client-welcome">
+        <h2>Welcome to the Owner Archetype Assessment</h2>
+        <p>Please enter your name to begin or continue your assessment journey.</p>
+    </div>
+
+    <div class="client-name-input">
+        <input type="text" id="clientModeInput" placeholder="Enter your name">
+        <button onclick="setClientName()">Continue</button>
+    </div>
+
+    <div id="assessmentView" class="assessment-area">
+        <div class="category">
+            <div>
+                <h3>Style & Quality</h3>
+                <p>Importance of appearance</p>
+            </div>
+            <div class="bubble-container" id="style-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <div>
+                <h3>Speed & Turnaround</h3>
+                <p>How quickly project completes</p>
+            </div>
+            <div class="bubble-container" id="speed-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <div>
+                <h3>Budget Awareness</h3>
+                <p>Concern for costs</p>
+            </div>
+            <div class="bubble-container" id="budget-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <div>
+                <h3>Longevity & Durability</h3>
+                <p>How long solution needs to last</p>
+            </div>
+            <div class="bubble-container" id="longevity-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <div>
+                <h3>Control & Involvement</h3>
+                <p>Client participation desired</p>
+            </div>
+            <div class="bubble-container" id="control-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <div>
+                <h3>Life Load & Complexity</h3>
+                <p>Household activity level</p>
+            </div>
+            <div class="bubble-container" id="lifeload-bubbles">
+                <div class="bubble" data-value="1"></div>
+                <div class="bubble" data-value="2"></div>
+                <div class="bubble" data-value="3"></div>
+                <div class="bubble" data-value="4"></div>
+                <div class="bubble" data-value="5"></div>
+            </div>
+        </div>
+
+        <div id="counter">Points: <span class="current-points">0</span>/18</div>
+        
+        <div class="buttons">
+            <button>Reset</button>
+            <button id="calculateBtn" disabled>Calculate</button>
+        </div>
+
+        <div id="resultView" class="hidden">
+            <div class="saved-info" id="savedInfo">
+                <div class="saved-info-grid">
+                    <div class="saved-info-item">
+                        <div class="saved-info-label">Test Date</div>
+                        <div class="saved-info-value" id="savedDate">--</div>
+                    </div>
+                    <div class="saved-info-item">
+                        <div class="saved-info-label">Client Name</div>
+                        <div class="saved-info-value" id="savedClientName">--</div>
+                    </div>
+                    <div class="saved-info-item">
+                        <div class="saved-info-label">Archetype Result</div>
+                        <div class="saved-info-value" id="savedProfileId">--</div>
+                    </div>
+                </div>
+            </div>
+            <div class="summary-section">
+                <h3 id="archetypeTitle"></h3>
+                <p id="archetypeTagline"></p>
+                <p id="archetypeDescription"></p>
+                <div>
+                    <h3>How to Work With This Type:</h3>
+                    <p id="archetypeAdvice"></p>
+                </div>
+            </div>
+            <div class="save-section">
+                <input type="text" id="clientName" placeholder="Enter client name">
+                <button class="save-button" onclick="saveClient()">Save</button>
+            </div>
+            <div class="profile-history" id="profileHistory">
+                <h3>Client Test History</h3>
+                <div class="saved-tests" id="savedTests"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-content">
+            <h3>Delete Client</h3>
+            <p>Are you sure you want to delete this client?</p>
+            <div class="modal-buttons">
+                <button class="modal-button cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-button confirm" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        window.points = {};
+        window.totalPoints = 0;
+        
+        // Add to existing script
+        let isClientMode = false;
+        let currentClientName = '';
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up initial points
+            window.points = {
+                style: 0,
+                speed: 0,
+                budget: 0,
+                longevity: 0,
+                control: 0,
+                lifeload: 0
+            };
+            window.totalPoints = 0;
+            
+            // Set up event listeners for bubbles
+            document.querySelectorAll('.bubble').forEach(bubble => {
+                bubble.addEventListener('click', function() {
+                    const category = this.closest('.bubble-container').id.replace('-bubbles', '');
+                    const value = parseInt(this.getAttribute('data-value'));
+                    selectBubble(category, value, this);
+                });
+            });
+
+            // Set up event listener for reset button
+            document.querySelector('.buttons button:first-child').addEventListener('click', resetAll);
+            
+            // Set up event listener for calculate button
+            document.getElementById('calculateBtn').addEventListener('click', calculate);
+
+            displaySavedClients();
+
+            // Make assessment view focusable
+            document.getElementById('assessmentView').setAttribute('tabindex', '-1');
+
+            // Initialize the roster display
+            displayRosterClients();
+
+            // Add global click handler for the roster
+            document.getElementById('rosterClients').addEventListener('click', function(e) {
+                // Prevent default behavior for action buttons
+                if (e.target.closest('.actions')) {
+                    e.stopPropagation();
+                }
+            });
+
+            // Check for saved mode
+            isClientMode = localStorage.getItem('isClientMode') === 'true';
+            currentClientName = localStorage.getItem('currentClientName') || '';
+            
+            if (isClientMode) {
+                document.body.classList.add('client-mode');
+                if (currentClientName) {
+                    showClientView(currentClientName);
+                }
+            } else {
+                document.getElementById('assessmentView').classList.add('active');
+            }
+        });
+
+        // Select bubble function
+        function selectBubble(category, value, clickedBubble) {
+            // Find all bubbles in this category
+            const container = document.getElementById(category + '-bubbles');
+            const bubbles = container.getElementsByClassName('bubble');
+            const wasSelected = clickedBubble.classList.contains('selected');
+            
+            // Update points
+            const oldValue = window.points[category] || 0;
+            // If clicking an already selected bubble, deselect it and set value to 0
+            const newValue = wasSelected ? 0 : value;
+            window.points[category] = newValue;
+            window.totalPoints = window.totalPoints - oldValue + newValue;
+            
+            // Update UI
+            Array.from(bubbles).forEach(bubble => {
+                if (parseInt(bubble.getAttribute('data-value')) <= newValue) {
+                    bubble.classList.add('selected');
+                } else {
+                    bubble.classList.remove('selected');
+                }
+            });
+            
+            // If deselecting, remove selected class from clicked bubble
+            if (wasSelected) {
+                clickedBubble.classList.remove('selected');
+            }
+            
+            // Update counter with formatted HTML
+            const counterElement = document.getElementById('counter');
+            counterElement.innerHTML = `Points: <span class="current-points">${window.totalPoints}</span>/18`;
+            
+            // Update counter styling based on points
+            counterElement.classList.remove('complete', 'over');
+            if (window.totalPoints === 18) {
+                counterElement.classList.add('complete');
+            } else if (window.totalPoints > 18) {
+                counterElement.classList.add('over');
+            }
+            
+            // Enable/disable calculate button
+            document.getElementById('calculateBtn').disabled = (window.totalPoints !== 18);
+        }
+
+        // Reset function
+        function resetAll() {
+            // Reset points
+            Object.keys(window.points).forEach(category => {
+                window.points[category] = 0;
+            });
+            window.totalPoints = 0;
+            
+            // Reset UI
+            document.querySelectorAll('.bubble').forEach(bubble => {
+                bubble.classList.remove('selected');
+            });
+            
+            // Reset counter with formatted HTML
+            const counterElement = document.getElementById('counter');
+            counterElement.innerHTML = `Points: <span class="current-points">0</span>/18`;
+            counterElement.classList.remove('complete', 'over');
+            
+            // Disable calculate button
+            document.getElementById('calculateBtn').disabled = true;
+            
+            // Clear input
+            document.getElementById('clientName').value = '';
+        }
+        
+        // Calculate function
+        function calculate() {
+            const archetypeId = determineArchetype();
+            displayArchetype(archetypeId);
+            
+            // Show results
+            document.getElementById('resultView').classList.remove('hidden');
+            
+            // In client mode, auto-save the result
+            if (isClientMode && currentClientName) {
+                saveClient();
+            } else {
+                // Show save section only in admin mode
+                document.querySelector('.save-section').style.display = 'block';
+            }
+        }
+        
+        // Determine archetype based on points
+        function determineArchetype() {
+            let points = window.points;
+            
+            // Check for special cases
+            const zeroCount = Object.values(points).filter(val => val === 0).length;
+            const fiveCount = Object.values(points).filter(val => val === 5).length;
+            
+            if (zeroCount >= 2 || fiveCount >= 3) {
+                return 'trickster';
+            }
+            
+            if (Object.values(points).every(val => val >= 2 && val <= 4)) {
+                return 'standard-owner';
+            }
+            
+            // Get highest categories
+            const entries = Object.entries(points).sort((a, b) => b[1] - a[1]);
+            
+            if (entries[0][1] >= 4) {
+                // Check highest category
+                const highestCategory = entries[0][0];
+                const highestValue = entries[0][1];
+                
+                if (highestCategory === 'style' && highestValue === 5) {
+                    return 'host';
+                } else if (highestCategory === 'speed' && highestValue >= 4) {
+                    return 'busy-owner';
+                } else if (highestCategory === 'longevity' && highestValue >= 4) {
+                    if (points.control >= 4) {
+                        return 'craftsman';
+                    }
+                    return 'champion-owner';
+                } else if (highestCategory === 'control' && highestValue >= 4) {
+                    return 'home-partner';
+                } else if (highestCategory === 'lifeload' && highestValue >= 4) {
+                    return 'family-home';
+                }
+            }
+            
+            if (points.control >= 3 && points.longevity >= 3) {
+                return 'steward';
+            }
+            
+            if (points.speed <= 1 && points.longevity >= 4) {
+                return 'strategist';
+            }
+            
+            if (points.style <= 2 && points.budget >= 3 && points.longevity >= 3) {
+                return 'respected-homeowner';
+            }
+            
+            // Default
+            return 'learner';
+        }
+        
+        // Display archetype information
+        function displayArchetype(archetypeId) {
+            const archetypes = {
+                'learner': {
+                    name: `The Learner`,
+                    description: `Curious, thoughtful, and eager to understand. They value learning, want to be part of the process, and are beginning to care more intentionally for their home. They aren't trying to control the work—they just want to understand it.`,
+                    tagline: `Help me understand how this all works.`,
+                    advice: `Take time to explain. Be transparent, patient, and educational. Build their trust through clarity and a sense of progress.`
+                },
+                'busy-owner': {
+                    name: `The Busy Owner`,
+                    description: `They're juggling too much to care about details. They need problems off their plate fast—and they'll gladly pay if you relieve the pressure. You might get short replies and forgotten follow-ups, but it's not personal.`,
+                    tagline: `I just need this done—fast and right.`,
+                    advice: `Offer a turnkey solution. Keep communication brief and focused. Be direct, and don't overexplain.`
+                },
+                'steward': {
+                    name: `The Steward`,
+                    description: `They're on the path to being a long-term homeowner. They want to do things right, but they're still learning how. They value durability and involvement, and want to grow alongside their home.`,
+                    tagline: `Let's build a plan I can follow.`,
+                    advice: `Walk beside them. Break down your approach into steps and educate without overwhelming. They'll become loyal if you give them confidence.`
+                },
+                'family-home': {
+                    name: `The Family Home`,
+                    description: `This home is busy, loud, and lived in. Kids, pets, work schedules—they're juggling everything. Cost and timing matter, but so does safety. They're not upgrading—they're surviving.`,
+                    tagline: `We need to keep things from falling apart.`,
+                    advice: `Be flexible. Provide practical, low-disruption solutions. Offer smart prioritization that fits their life rhythm.`
+                },
+                'home-partner': {
+                    name: `The Home Partner`,
+                    description: `You're their teammate—not just a service provider. They trust your insight and want to build a long-term relationship. They'll ask for updates, but not because they doubt you—because they care.`,
+                    tagline: `Let's make this home better together.`,
+                    advice: `Treat them like a co-pilot. Communicate regularly, offer future planning, and build rituals of care.`
+                },
+                'strategist': {
+                    name: `The Strategist`,
+                    description: `They want durability, ROI, and clarity. They're planners, not reactors. They'll ask questions not to challenge you, but to make the smartest decision.`,
+                    tagline: `I want it done once and done right.`,
+                    advice: `Speak in logic and trade-offs. Lay out the future impact of decisions. Respect their timeline and give layered options.`
+                },
+                'respected-homeowner': {
+                    name: `The Respected Homeowner`,
+                    description: `Practical, even-tempered, and grounded. They don't want flash—they want reliability. Their goal is peace of mind, not perfection.`,
+                    tagline: `Keep it working, keep it simple.`,
+                    advice: `Be straight with them. Avoid over-designing. Prioritize long-term maintenance and functional wins.`
+                },
+                'craftsman': {
+                    name: `The Craftsman`,
+                    description: `Often a retired tradesperson or experienced DIYer. They know what good work looks like. They're not hands-off—they're just not doing it anymore.`,
+                    tagline: `Do it right or don't do it at all.`,
+                    advice: `Skip fluff. Get to the point. Do your best work, or don't take the job. They'll know if you're faking it.`
+                },
+                'host': {
+                    name: `The Host`,
+                    description: `Their home is where people gather. Flow, mood, and finish matter more than longevity or budget. They may splurge where others wouldn't.`,
+                    tagline: `I want this place to feel amazing.`,
+                    advice: `Respect their eye. Recommend beautiful materials and presentation. Help shape the guest experience.`
+                },
+                'champion-owner': {
+                    name: `The Champion Owner`,
+                    description: `Your ideal client. They value you, trust you, and promote you. They want premium care and lasting solutions—but won't micromanage.`,
+                    tagline: `You're my guy. What do we do next?`,
+                    advice: `Keep them close. Overdeliver. Offer loyalty perks, previews, or updates. These are your legacy builders.`
+                },
+                'standard-owner': {
+                    name: `The Standard Owner`,
+                    description: `Balanced and clear-minded. They care—but not obsessively. They're thoughtful and easy to work with.`,
+                    tagline: `I want good work, good timing, and good value.`,
+                    advice: `Treat them with consistency and respect. Don't over-customize—just stay dependable.`
+                },
+                'trickster': {
+                    name: `The Trickster`,
+                    description: `Their input is unclear, conflicting, or emotionally inconsistent. They may not know what they want—or they change their mind halfway through.`,
+                    tagline: `Oh… I didn't really think about that.`,
+                    advice: `Set tight scope. Reconfirm every agreement. Use writing, visuals, and small phases. Clarify before building.`
+                }
+            };
+            
+            const archetype = archetypes[archetypeId];
+            
+            document.getElementById('archetypeTitle').textContent = archetype.name;
+            document.getElementById('archetypeTagline').textContent = archetype.tagline;
+            document.getElementById('archetypeDescription').textContent = archetype.description;
+            document.getElementById('archetypeAdvice').textContent = archetype.advice;
+        }
+
+        // Save client function
+        function saveClient() {
+            let clientName = '';
+            
+            if (isClientMode) {
+                clientName = currentClientName;
+            } else {
+                clientName = document.getElementById('clientName').value.trim();
+                if (!clientName) {
+                    alert('Please enter a client name');
+                    return;
+                }
+            }
+
+            const clientData = {
+                name: clientName,
+                archetype: document.getElementById('archetypeTitle').textContent,
+                points: { ...window.points },
+                date: new Date().toLocaleDateString(),
+                timestamp: Date.now()
+            };
+
+            // Get existing clients from localStorage
+            let savedClients = JSON.parse(localStorage.getItem('clients') || '[]');
+            savedClients.push(clientData);
+            localStorage.setItem('clients', JSON.stringify(savedClients));
+
+            // Get all tests for this client for history display
+            const clientTests = savedClients.filter(test => test.name === clientName)
+                                         .sort((a, b) => b.timestamp - a.timestamp);
+
+            // Hide test input controls
+            document.getElementById('counter').style.display = 'none';
+            document.querySelector('.buttons').style.display = 'none';
+            document.querySelector('.save-section').style.display = 'none';
+
+            // Show saved profile info
+            const savedInfo = document.getElementById('savedInfo');
+            savedInfo.classList.add('active');
+            document.getElementById('savedProfileId').textContent = clientData.archetype || '--';
+            document.getElementById('savedClientName').textContent = clientData.name || '--';
+            document.getElementById('savedDate').textContent = clientData.date || '--';
+
+            // Show the results view
+            document.getElementById('resultView').classList.remove('hidden');
+
+            // Display client history
+            displayClientHistory(clientTests);
+
+            // Only refresh roster in admin mode
+            if (!isClientMode) {
+                displayRosterClients();
+            }
+
+            // Scroll to top to show the full result
+            scrollToTop();
+        }
+
+        // Display roster (latest test per client)
+        function displayRosterClients() {
+            const rosterClientsDiv = document.getElementById('rosterClients');
+            const clients = JSON.parse(localStorage.getItem('clients') || '[]');
+
+            // Group by client name and get latest test
+            const latestTests = clients.reduce((acc, test) => {
+                if (!acc[test.name] || acc[test.name].timestamp < test.timestamp) {
+                    acc[test.name] = test;
+                }
+                return acc;
+            }, {});
+
+            const latestTestsArray = Object.values(latestTests);
+
+            rosterClientsDiv.innerHTML = latestTestsArray.map((client, index) => `
+                <div class="client-card">
+                    <p>${client.archetype}</p>
+                    <h4 class="client-name">${client.name}</h4>
+                    <p class="date">${client.date}</p>
+                    <div class="actions" onclick="event.stopPropagation()">
+                        <button class="action-btn" onclick="editClientName('${client.name}')">Edit</button>
+                        <button class="action-btn delete" onclick="showDeleteModal('${client.name}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add click handlers to the cards
+            const cards = rosterClientsDiv.querySelectorAll('.client-card');
+            cards.forEach((card, index) => {
+                card.addEventListener('click', function(e) {
+                    if (!e.target.closest('.actions')) {
+                        const clientName = latestTestsArray[index].name;
+                        loadLatestClientTest(clientName);
+                    }
+                });
+            });
+        }
+
+        // Load latest test for a client
+        function loadLatestClientTest(clientName) {
+            const clients = JSON.parse(localStorage.getItem('clients') || '[]');
+            const clientTests = clients.filter(test => test.name === clientName)
+                                    .sort((a, b) => b.timestamp - a.timestamp);
+            
+            if (clientTests.length > 0) {
+                loadClientTest(clientTests[0], clientTests);
+            }
+        }
+
+        // Load specific test and show client history
+        function loadClientTest(test, allTests = null) {
+            // Reset and load points
+            resetAll();
+            
+            // If allTests not provided, get them from storage
+            if (!allTests) {
+                const clients = JSON.parse(localStorage.getItem('clients') || '[]');
+                allTests = clients.filter(t => t.name === test.name)
+                                .sort((a, b) => b.timestamp - a.timestamp);
+            }
+
+            // Load points
+            Object.entries(test.points).forEach(([category, value]) => {
+                window.points[category] = value;
+                const bubbles = document.querySelectorAll(`#${category}-bubbles .bubble`);
+                bubbles.forEach((bubble, i) => {
+                    if (i < value) {
+                        bubble.classList.add('selected');
+                    }
+                });
+            });
+
+            // Update total points
+            window.totalPoints = Object.values(test.points).reduce((a, b) => a + b, 0);
+
+            // Show saved profile info
+            const savedInfo = document.getElementById('savedInfo');
+            savedInfo.classList.add('active');
+            document.getElementById('savedProfileId').textContent = test.archetype || '--';
+            document.getElementById('savedClientName').textContent = test.name || '--';
+            document.getElementById('savedDate').textContent = test.date || '--';
+
+            // Hide elements for test result view
+            document.getElementById('counter').style.display = 'none';
+            document.querySelector('.buttons').style.display = 'none';
+            document.querySelector('.save-section').style.display = 'none';
+
+            // Calculate without showing save section
+            const archetypeId = determineArchetype();
+            displayArchetype(archetypeId);
+            
+            // Show the results view
+            document.getElementById('resultView').classList.remove('hidden');
+
+            // Display client history with New Test button
+            displayClientHistory(allTests);
+
+            // If we're in the roster view, close it
+            if (document.getElementById('rosterPage').classList.contains('active')) {
+                toggleRoster();
+            }
+
+            // Scroll to top
+            scrollToTop();
+        }
+
+        // Display client test history
+        function displayClientHistory(tests) {
+            const historyDiv = document.getElementById('profileHistory');
+            const savedTestsDiv = document.getElementById('savedTests');
+
+            if (tests && tests.length > 0) {
+                historyDiv.style.display = 'block';
+                
+                // Add New Test button above history
+                historyDiv.innerHTML = `
+                    <button class="new-test-button" onclick="startNewTest()">New Test</button>
+                    <h3>Client Test History</h3>
+                    <div class="saved-tests" id="savedTests"></div>
+                `;
+
+                // Re-get the savedTestsDiv since we recreated it
+                const savedTestsDiv = document.getElementById('savedTests');
+                savedTestsDiv.innerHTML = tests.map((test, index) => `
+                    <div class="client-card">
+                        <p>${test.archetype}</p>
+                        <h4>${test.name}</h4>
+                        <p class="date">${test.date}</p>
+                    </div>
+                `).join('');
+
+                // Add click handlers
+                const cards = savedTestsDiv.querySelectorAll('.client-card');
+                cards.forEach((card, index) => {
+                    card.addEventListener('click', () => loadClientTest(tests[index]));
+                });
+            } else {
+                historyDiv.style.display = 'none';
+            }
+        }
+
+        // Delete all tests for a client
+        function showDeleteModal(clientName) {
+            clientToDelete = clientName;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function confirmDelete() {
+            if (clientToDelete) {
+                const clients = JSON.parse(localStorage.getItem('clients') || '[]');
+                const updatedClients = clients.filter(client => client.name !== clientToDelete);
+                localStorage.setItem('clients', JSON.stringify(updatedClients));
+                displayRosterClients();
+                closeDeleteModal();
+            }
+        }
+
+        // Add these new functions
+        function toggleRoster() {
+            const rosterPage = document.getElementById('rosterPage');
+            rosterPage.classList.toggle('active');
+            displayRosterClients();
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            document.getElementById('assessmentView').focus();
+        }
+
+        // Add these new variables and functions
+        let clientToDelete = null;
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            clientToDelete = null;
+        }
+
+        // Function to start a new test - unified behavior for both buttons
+        function startNewTest() {
+            // Reset all points and UI
+            resetAll();
+            
+            // Show all input elements
+            document.getElementById('counter').style.display = 'block';
+            document.querySelector('.buttons').style.display = 'flex';
+            
+            // Only show save section in admin mode
+            document.querySelector('.save-section').style.display = isClientMode ? 'none' : 'block';
+            
+            // Hide the saved info section
+            document.getElementById('savedInfo').classList.remove('active');
+            
+            // Hide the results view
+            document.getElementById('resultView').classList.add('hidden');
+            
+            // Hide the profile history
+            document.getElementById('profileHistory').style.display = 'none';
+            
+            // Close the roster page if it's open
+            if (document.getElementById('rosterPage').classList.contains('active')) {
+                toggleRoster();
+            }
+            
+            // Show assessment view in client mode
+            if (isClientMode) {
+                document.getElementById('assessmentView').classList.add('active');
+            }
+            
+            // Scroll to top
+            scrollToTop();
+        }
+
+        // Edit client name
+        function editClientName(oldName) {
+            // Find the client card that contains this name
+            const clientCard = Array.from(document.querySelectorAll('#rosterClients .client-card'))
+                .find(card => card.querySelector('.client-name').textContent === oldName);
+            
+            if (!clientCard) return;
+            
+            const nameElement = clientCard.querySelector('.client-name');
+            const currentName = nameElement.textContent;
+            
+            nameElement.innerHTML = `
+                <input type="text" 
+                    value="${currentName}" 
+                    class="edit-mode client-name" 
+                    onblur="saveClientName('${oldName}', this.value)"
+                    onkeypress="if(event.key === 'Enter') { saveClientName('${oldName}', this.value); }"
+                    onclick="event.stopPropagation()">
+            `;
+            
+            const input = nameElement.querySelector('input');
+            input.focus();
+            input.select();
+        }
+
+        // Save edited client name
+        function saveClientName(oldName, newName) {
+            if (!newName.trim() || oldName === newName) {
+                // If invalid new name or unchanged, just refresh to revert the UI
+                displayRosterClients();
+                return;
+            }
+
+            // Get all clients
+            let clients = JSON.parse(localStorage.getItem('clients') || '[]');
+
+            // Update all tests for this client
+            clients = clients.map(client => {
+                if (client.name === oldName) {
+                    return { ...client, name: newName.trim() };
+                }
+                return client;
+            });
+
+            // Save back to localStorage
+            localStorage.setItem('clients', JSON.stringify(clients));
+
+            // Refresh displays
+            displayRosterClients();
+        }
+
+        function toggleMode() {
+            isClientMode = !isClientMode;
+            localStorage.setItem('isClientMode', isClientMode);
+            
+            if (isClientMode) {
+                document.body.classList.add('client-mode');
+                document.getElementById('assessmentView').classList.remove('active');
+                currentClientName = '';
+                localStorage.removeItem('currentClientName');
+            } else {
+                document.body.classList.remove('client-mode');
+                document.getElementById('assessmentView').classList.add('active');
+                startNewTest();
+            }
+        }
+
+        function setClientName() {
+            const nameInput = document.getElementById('clientModeInput');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            currentClientName = name;
+            localStorage.setItem('currentClientName', name);
+            showClientView(name);
+        }
+
+        function showClientView(clientName) {
+            // Show assessment view
+            document.getElementById('assessmentView').classList.add('active');
+            
+            // Check if client has previous tests
+            const clients = JSON.parse(localStorage.getItem('clients') || '[]');
+            const clientTests = clients.filter(test => test.name === clientName)
+                                    .sort((a, b) => b.timestamp - a.timestamp);
+            
+            if (clientTests.length > 0) {
+                // Load their latest test
+                loadClientTest(clientTests[0], clientTests);
+            } else {
+                // Start a new test
+                startNewTest();
+            }
+        }
+    </script>
+</body>
+</html> 

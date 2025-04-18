@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#333333">
+    <title>ToolMan Client Archetype</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.png">
+    <style>
+        #confirmDialog.hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ToolMan Client Archetype</h1>
+        <button id="menuButton" aria-label="Menu">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
+            </svg>
+        </button>
+    </header>
+
+    <main>
+        <div id="categoryView" class="view">
+            <h2>Client Assessment</h2>
+            <p class="instructions">Assign 18 total points across the categories below (0-5 per category)</p>
+            <div id="pointCounter">Points: <span id="usedPoints">0</span>/18</div>
+
+            <div class="categories vertical">
+                <div class="category" data-category="style">
+                    <h3>Style & Quality</h3>
+                    <p class="description">Importance of appearance and craftsmanship</p>
+                    <div class="bubbles">
+                        <div class="bubble" data-value="0" data-selected="true">0</div>
+                        <div class="bubble" data-value="1">1</div>
+                        <div class="bubble" data-value="2">2</div>
+                        <div class="bubble" data-value="3">3</div>
+                        <div class="bubble" data-value="4">4</div>
+                        <div class="bubble" data-value="5">5</div>
+                    </div>
+                </div>
+
+                <div class="category" data-category="speed">
+                    <h3>Speed & Turnaround</h3>
+                    <p class="description">How quickly the project needs completion</p>
+                    <div class="bubbles">
+                        <div class="bubble" data-value="0" data-selected="true">0</div>
+                        <div class="bubble" data-value="1">1</div>
+                        <div class="bubble" data-value="2">2</div>
+                        <div class="bubble" data-value="3">3</div>
+                        <div class="bubble" data-value="4">4</div>
+                        <div class="bubble" data-value="5">5</div>
+                    </div>
+                </div>
+
+                <div class="category" data-category="budget">
+                    <h3>Budget Awareness</h3>
+                    <p class="description">Level of concern for costs</p>
+                    <div class="bubbles">
+                        <div class="bubble" data-value="0" data-selected="true">0</div>
+                        <div class="bubble" data-value="1">1</div>
+                        <div class="bubble" data-value="2">2</div>
+                        <div class="bubble" data-value="3">3</div>
+                        <div class="bubble" data-value="4">4</div>
+                        <div class="bubble" data-value="5">5</div>
+                    </div>
+                </div>
+
+                <div class="category" data-category="longevity">
+                    <h3>Longevity & Durability</h3>
+                    <p class="description">How long the solution needs to last</p>
+                    <div class="bubbles">
+                        <div class="bubble" data-value="0" data-selected="true">0</div>
+                        <div class="bubble" data-value="1">1</div>
+                        <div class="bubble" data-value="2">2</div>
+                        <div class="bubble" data-value="3">3</div>
+                        <div class="bubble" data-value="4">4</div>
+                        <div class="bubble" data-value="5">5</div>
+                    </div>
+                </div>
+
+                <div class="category" data-category="control">
+                    <h3>Control & Involvement</h3>
+                    <p class="description">Degree of client participation desired</p>
+                    <div class="bubbles">
+                        <div class="bubble" data-value="0" data-selected="true">0</div>
+                        <div class="bubble" data-value="1">1</div>
+                        <div class="bubble" data-value="2">2</div>
+                        <div class="bubble" data-value="3">3</div>
+                        <div class="bubble" data-value="4">4</div>
+                        <div class="bubble" data-value="5">5</div>
+                    </div>
+                </div>
+
+                <div class="category" data-category="lifeload">
+                    <h3>Life Load & Household Complexity</h3>
+                    <p class="description">Family demands & household activity level</p>
+                    <div class="bubbles">
+                        <div class="bubble" data-value="0" data-selected="true">0</div>
+                        <div class="bubble" data-value="1">1</div>
+                        <div class="bubble" data-value="2">2</div>
+                        <div class="bubble" data-value="3">3</div>
+                        <div class="bubble" data-value="4">4</div>
+                        <div class="bubble" data-value="5">5</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="resetButton">Reset</button>
+                <button id="calculateButton" disabled>Calculate Archetype</button>
+            </div>
+        </div>
+
+        <div id="resultView" class="view hidden">
+            <h2>Client Archetype</h2>
+            <div class="result-content">
+                <h3 id="archetype-title"></h3>
+                <p id="archetype-description"></p>
+                <p id="archetype-tagline" class="tagline"></p>
+                <div class="work-with">
+                    <h4>How to Work With This Type:</h4>
+                    <p id="archetype-advice"></p>
+                </div>
+            </div>
+            <div class="result-actions">
+                <button id="adjustButton">Adjust</button>
+                <button id="saveButton">Save</button>
+            </div>
+        </div>
+
+        <div id="saveView" class="view hidden">
+            <h2>Save Client</h2>
+            <div class="save-form">
+                <label for="clientName">Client Name:</label>
+                <input type="text" id="clientName" placeholder="Enter client name" required>
+                <button id="confirmSaveButton">Save</button>
+                <button id="cancelSaveButton">Cancel</button>
+            </div>
+        </div>
+
+        <div id="rosterView" class="view hidden">
+            <h2>Client Roster</h2>
+            <div id="clientList"></div>
+            <button id="closeRosterButton">Close</button>
+        </div>
+
+        <div id="clientDetailView" class="view hidden">
+            <h2>Client Details</h2>
+            <div class="client-details">
+                <h3 id="detail-name"></h3>
+                <p id="detail-date"></p>
+                <h4 id="detail-archetype"></h4>
+                <p id="detail-description"></p>
+                <p id="detail-tagline" class="tagline"></p>
+                <div class="work-with">
+                    <h4>How to Work With This Type:</h4>
+                    <p id="detail-advice"></p>
+                </div>
+            </div>
+            <div class="other-clients">
+                <h4>Other Client Assessments:</h4>
+                <div id="otherClientsList"></div>
+            </div>
+            <div class="detail-actions">
+                <button id="editButton">Edit</button>
+                <button id="deleteButton">Delete</button>
+                <button id="closeDetailButton">Close</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="confirmDialog" class="dialog hidden">
+        <div class="dialog-content">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this client record?</p>
+            <div class="dialog-buttons">
+                <button id="confirmDeleteButton">Delete</button>
+                <button id="cancelDeleteButton" onclick="document.getElementById('confirmDialog').classList.add('hidden');">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="menu" class="hidden">
+        <button id="showRosterButton">Client Roster</button>
+        <button id="aboutButton">About</button>
+    </div>
+
+    <script src="test.js"></script>
+    <script>
+        // Register service worker for PWA capabilities
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(reg => console.log('Service worker registered'))
+                .catch(err => console.log('Service worker registration failed', err));
+        }
+    </script>
+</body>
+</html> 

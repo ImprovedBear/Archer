@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Archetype Tool</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        #debug {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 15px;
+            color: #333;
+            font-family: monospace;
+        }
+        
+        .counter {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .category {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .category-header h3 {
+            margin: 0 0 5px 0;
+        }
+        
+        .description {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+        }
+        
+        .bubbles {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .bubble {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #ddd;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .bubble.selected {
+            background-color: #333;
+        }
+        
+        .bubble:hover {
+            transform: scale(1.1);
+        }
+        
+        .bubble-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 220px;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: #777;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            border-radius: 4px;
+        }
+        
+        button:hover {
+            background-color: #444;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .result {
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        
+        .tagline {
+            font-style: italic;
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        .work-with {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Client Archetype</h1>
+    </header>
+    
+    <div id="debug">Debug info will appear here when you interact with the page</div>
+    
+    <main>
+        <div id="assessmentView">
+            <h2>Client Assessment</h2>
+            <p>Assign 18 total points across all categories (0-5 per category)</p>
+            
+            <div class="counter">
+                Points: <span id="pointCounter">0</span>/18
+            </div>
+            
+            <div class="category">
+                <div class="category-header">
+                    <h3>Style & Quality</h3>
+                    <p class="description">Importance of appearance and craftsmanship</p>
+                </div>
+                <div class="rating-control">
+                    <div class="bubbles" data-category="style">
+                        <div class="bubble selected" data-value="0"></div>
+                        <div class="bubble" data-value="1"></div>
+                        <div class="bubble" data-value="2"></div>
+                        <div class="bubble" data-value="3"></div>
+                        <div class="bubble" data-value="4"></div>
+                        <div class="bubble" data-value="5"></div>
+                    </div>
+                    <div class="bubble-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-header">
+                    <h3>Speed & Turnaround</h3>
+                    <p class="description">How quickly the project needs completion</p>
+                </div>
+                <div class="rating-control">
+                    <div class="bubbles" data-category="speed">
+                        <div class="bubble selected" data-value="0"></div>
+                        <div class="bubble" data-value="1"></div>
+                        <div class="bubble" data-value="2"></div>
+                        <div class="bubble" data-value="3"></div>
+                        <div class="bubble" data-value="4"></div>
+                        <div class="bubble" data-value="5"></div>
+                    </div>
+                    <div class="bubble-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-header">
+                    <h3>Budget Awareness</h3>
+                    <p class="description">Level of concern for costs</p>
+                </div>
+                <div class="rating-control">
+                    <div class="bubbles" data-category="budget">
+                        <div class="bubble selected" data-value="0"></div>
+                        <div class="bubble" data-value="1"></div>
+                        <div class="bubble" data-value="2"></div>
+                        <div class="bubble" data-value="3"></div>
+                        <div class="bubble" data-value="4"></div>
+                        <div class="bubble" data-value="5"></div>
+                    </div>
+                    <div class="bubble-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-header">
+                    <h3>Longevity & Durability</h3>
+                    <p class="description">How long the solution needs to last</p>
+                </div>
+                <div class="rating-control">
+                    <div class="bubbles" data-category="longevity">
+                        <div class="bubble selected" data-value="0"></div>
+                        <div class="bubble" data-value="1"></div>
+                        <div class="bubble" data-value="2"></div>
+                        <div class="bubble" data-value="3"></div>
+                        <div class="bubble" data-value="4"></div>
+                        <div class="bubble" data-value="5"></div>
+                    </div>
+                    <div class="bubble-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-header">
+                    <h3>Control & Involvement</h3>
+                    <p class="description">Degree of client participation desired</p>
+                </div>
+                <div class="rating-control">
+                    <div class="bubbles" data-category="control">
+                        <div class="bubble selected" data-value="0"></div>
+                        <div class="bubble" data-value="1"></div>
+                        <div class="bubble" data-value="2"></div>
+                        <div class="bubble" data-value="3"></div>
+                        <div class="bubble" data-value="4"></div>
+                        <div class="bubble" data-value="5"></div>
+                    </div>
+                    <div class="bubble-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-header">
+                    <h3>Life Load & Complexity</h3>
+                    <p class="description">Family demands & household activity level</p>
+                </div>
+                <div class="rating-control">
+                    <div class="bubbles" data-category="lifeload">
+                        <div class="bubble selected" data-value="0"></div>
+                        <div class="bubble" data-value="1"></div>
+                        <div class="bubble" data-value="2"></div>
+                        <div class="bubble" data-value="3"></div>
+                        <div class="bubble" data-value="4"></div>
+                        <div class="bubble" data-value="5"></div>
+                    </div>
+                    <div class="bubble-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button id="resetButton">Reset</button>
+                <button id="calculateButton" disabled>Calculate Archetype</button>
+            </div>
+        </div>
+        
+        <div id="resultView" class="hidden">
+            <h2>Client Archetype</h2>
+            
+            <div class="result">
+                <h3 id="archetype-title"></h3>
+                <p id="archetype-tagline" class="tagline"></p>
+                <p id="archetype-description"></p>
+                
+                <div class="work-with">
+                    <h3>How to Work With This Type:</h3>
+                    <p id="archetype-advice"></p>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button id="adjustButton">Adjust</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const assessmentView = document.getElementById('assessmentView');
+            const resultView = document.getElementById('resultView');
+            const pointCounter = document.getElementById('pointCounter');
+            const calculateButton = document.getElementById('calculateButton');
+            const resetButton = document.getElementById('resetButton');
+            const adjustButton = document.getElementById('adjustButton');
+            const debugArea = document.getElementById('debug');
+            
+            function logDebug(message) {
+                console.log(message);
+                debugArea.textContent = message;
+            }
+            
+            logDebug('Page loaded. Try clicking on the bubbles.');
+            
+            // Add a global click handler to see if clicks are working
+            document.body.addEventListener('click', function(e) {
+                logDebug(`Clicked at (${e.clientX}, ${e.clientY}). Element: ${e.target.tagName} class: ${e.target.className}`);
+            });
+            
+            const archetypeTitle = document.getElementById('archetype-title');
+            const archetypeTagline = document.getElementById('archetype-tagline');
+            const archetypeDescription = document.getElementById('archetype-description');
+            const archetypeAdvice = document.getElementById('archetype-advice');
+            
+            // Initialize points tracking
+            let points = {
+                style: 0,
+                speed: 0,
+                budget: 0,
+                longevity: 0,
+                control: 0,
+                lifeload: 0
+            };
+            let totalPoints = 0;
+            
+            // Add click handlers directly to all bubbles
+            const allBubbles = document.querySelectorAll('.bubble');
+            allBubbles.forEach(bubble => {
+                bubble.onclick = function(e) {
+                    // Get information from clicked bubble
+                    const value = parseInt(this.getAttribute('data-value'));
+                    const bubbleGroup = this.parentElement;
+                    const category = bubbleGroup.getAttribute('data-category');
+                    const oldValue = points[category];
+                    
+                    logDebug(`Bubble clicked: category=${category}, value=${value}`);
+                    e.stopPropagation(); // Prevent the body click handler from firing
+                    
+                    // Update selected state visually
+                    const bubblesInCategory = bubbleGroup.querySelectorAll('.bubble');
+                    bubblesInCategory.forEach(b => b.classList.remove('selected'));
+                    
+                    // Select this bubble and all bubbles to its left
+                    bubblesInCategory.forEach(b => {
+                        if (parseInt(b.getAttribute('data-value')) <= value) {
+                            b.classList.add('selected');
+                        }
+                    });
+                    
+                    // Update points
+                    points[category] = value;
+                    totalPoints = totalPoints - oldValue + value;
+                    pointCounter.textContent = totalPoints;
+                    
+                    // Enable/disable calculate button
+                    calculateButton.disabled = totalPoints !== 18;
+                };
+            });
+            
+            // Reset button
+            resetButton.onclick = function() {
+                Object.keys(points).forEach(category => {
+                    points[category] = 0;
+                });
+                totalPoints = 0;
+                pointCounter.textContent = totalPoints;
+                
+                document.querySelectorAll('.bubble').forEach(bubble => {
+                    bubble.classList.remove('selected');
+                });
+                
+                document.querySelectorAll('.bubble[data-value="0"]').forEach(bubble => {
+                    bubble.classList.add('selected');
+                });
+                
+                calculateButton.disabled = true;
+            };
+            
+            // Calculate button
+            calculateButton.onclick = function() {
+                const archetypeId = determineArchetype(points);
+                displayArchetype(archetypeId);
+                
+                assessmentView.classList.add('hidden');
+                resultView.classList.remove('hidden');
+            };
+            
+            // Adjust button
+            adjustButton.onclick = function() {
+                resultView.classList.add('hidden');
+                assessmentView.classList.remove('hidden');
+            };
+            
+            // Determine archetype based on points
+            function determineArchetype(points) {
+                // Check for special cases
+                const zeroCount = Object.values(points).filter(val => val === 0).length;
+                const fiveCount = Object.values(points).filter(val => val === 5).length;
+                
+                if (zeroCount >= 2 || fiveCount >= 3) {
+                    return 'trickster';
+                }
+                
+                if (Object.values(points).every(val => val >= 2 && val <= 4)) {
+                    return 'standard-owner';
+                }
+                
+                // Get highest categories
+                const entries = Object.entries(points).sort((a, b) => b[1] - a[1]);
+                
+                if (entries[0][1] >= 4) {
+                    // Check highest category
+                    const highestCategory = entries[0][0];
+                    const highestValue = entries[0][1];
+                    
+                    if (highestCategory === 'style' && highestValue === 5) {
+                        return 'host';
+                    } else if (highestCategory === 'speed' && highestValue >= 4) {
+                        return 'busy-owner';
+                    } else if (highestCategory === 'longevity' && highestValue >= 4) {
+                        if (points.control >= 4) {
+                            return 'craftsman';
+                        }
+                        return 'champion-owner';
+                    } else if (highestCategory === 'control' && highestValue >= 4) {
+                        return 'home-partner';
+                    } else if (highestCategory === 'lifeload' && highestValue >= 4) {
+                        return 'family-home';
+                    }
+                }
+                
+                if (points.control >= 3 && points.longevity >= 3) {
+                    return 'steward';
+                }
+                
+                if (points.speed <= 1 && points.longevity >= 4) {
+                    return 'strategist';
+                }
+                
+                if (points.style <= 2 && points.budget >= 3 && points.longevity >= 3) {
+                    return 'respected-homeowner';
+                }
+                
+                // Default
+                return 'learner';
+            }
+            
+            // Display archetype information
+            function displayArchetype(archetypeId) {
+                const archetypes = {
+                    'learner': {
+                        name: 'The Learner',
+                        description: 'A knowledge-seeking homeowner who values collaboration and learning throughout the process.',
+                        tagline: 'Wants to understand the "why" behind recommendations',
+                        advice: 'Explain your reasoning clearly. Provide resources for further learning. Take time to teach during the project. Show respect for their questions and interest in learning.'
+                    },
+                    'busy-owner': {
+                        name: 'The Busy Owner',
+                        description: 'A time-constrained homeowner who needs quick, efficient solutions with minimal involvement.',
+                        tagline: 'Values speed and convenience above all else',
+                        advice: 'Be efficient with meetings and communications. Offer simplified decisions. Focus on speed and minimize disruption. Provide clear, concise updates.'
+                    },
+                    'steward': {
+                        name: 'The Steward',
+                        description: 'A caretaker who views their home as a legacy to be preserved and improved with care.',
+                        tagline: 'Prioritizes long-term care and maintenance',
+                        advice: 'Emphasize quality materials and craftsmanship. Provide documentation for future maintenance. Respect the home's history and character. Focus on sustainable solutions.'
+                    },
+                    'family-home': {
+                        name: 'The Family Home',
+                        description: 'A bustling household where practical solutions for everyday family life are the priority.',
+                        tagline: 'Needs solutions that work in a busy household',
+                        advice: 'Prioritize safety and durability. Respect the chaos of family life. Offer practical, functional solutions. Be patient with scheduling and communication.'
+                    },
+                    'home-partner': {
+                        name: 'The Home Partner',
+                        description: 'A collaborative homeowner who values teamwork and wants active involvement in decisions.',
+                        tagline: 'Values the collaborative process and relationship',
+                        advice: 'Invite input and collaboration. Hold regular check-ins. Share decision-making. Value their insights about their own home. Build a genuine relationship.'
+                    },
+                    'strategist': {
+                        name: 'The Strategist',
+                        description: 'A methodical planner focused on long-term value and structural integrity.',
+                        tagline: 'Plans meticulously for long-term outcomes',
+                        advice: 'Provide detailed plans and specifications. Discuss long-term implications. Share technical details. Respect their systematic approach. Offer data-driven recommendations.'
+                    },
+                    'respected-homeowner': {
+                        name: 'The Respected Homeowner',
+                        description: 'A practical homeowner seeking reliable, long-lasting solutions at a fair price.',
+                        tagline: 'Values straightforward quality and reliability',
+                        advice: 'Be transparent about costs and timelines. Provide straightforward options. Focus on reliability and proven solutions. Respect their practical approach to decision-making.'
+                    },
+                    'craftsman': {
+                        name: 'The Craftsman',
+                        description: 'A detail-oriented homeowner who appreciates technical excellence and hands-on involvement.',
+                        tagline: 'Values technical excellence and craftsmanship',
+                        advice: 'Share technical details and reasoning. Allow for inspection of work. Respect their knowledge of tools and techniques. Be prepared for detailed questions and high standards.'
+                    },
+                    'host': {
+                        name: 'The Host',
+                        description: 'An image-conscious homeowner focused on aesthetics and creating impressive spaces for entertaining.',
+                        tagline: 'Prioritizes aesthetics and impression management',
+                        advice: 'Focus on visual impact and design details. Maintain cleanliness during the project. Consider timing around social events. Offer options that enhance entertainment spaces.'
+                    },
+                    'champion-owner': {
+                        name: 'The Champion Owner',
+                        description: 'A quality-focused homeowner who values expertise and is willing to invest in excellence.',
+                        tagline: 'Seeks the best possible outcome regardless of time',
+                        advice: 'Demonstrate expertise and attention to detail. Recommend premium solutions when warranted. Take time to do things right. Share your professional perspective and experience.'
+                    },
+                    'standard-owner': {
+                        name: 'The Standard Owner',
+                        description: 'A balanced homeowner with moderate priorities across all categories.',
+                        tagline: 'Values balance and reasonable compromises',
+                        advice: 'Offer balanced recommendations. Provide good/better/best options. Focus on meeting expectations consistently. Maintain clear, regular communication.'
+                    },
+                    'trickster': {
+                        name: 'The Trickster',
+                        description: 'A homeowner with extreme or contradictory priorities that may be difficult to reconcile.',
+                        tagline: 'Has contradictory or extreme expectations',
+                        advice: 'Set very clear expectations. Document all agreements in writing. Identify potential conflicts early. Be prepared to educate on realistic constraints and trade-offs.'
+                    }
+                };
+                
+                const archetype = archetypes[archetypeId];
+                
+                archetypeTitle.textContent = archetype.name;
+                archetypeTagline.textContent = archetype.tagline;
+                archetypeDescription.textContent = archetype.description;
+                archetypeAdvice.textContent = archetype.advice;
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,21 @@
+{
+  "name": "toolman-client-archetype",
+  "version": "1.0.0",
+  "description": "A tool for assessing client priorities in home projects",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "pwa",
+    "client-assessment",
+    "home-improvement"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+} 

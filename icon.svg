@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" fill="#333333" rx="48" ry="48"/>
+  <g fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- T letter -->
+    <path d="M53 48 H93 M73 48 V120"/>
+    <!-- Wrench icon -->
+    <path d="M124 70 L144 90 A10 10 0 0 1 144 104 L136 112 A10 10 0 0 1 122 112 L102 92 A24 24 0 0 0 124 70 Z"/>
+    <path d="M118 76 A24 24 0 0 0 96 98"/>
+    <!-- Bubbles -->
+    <circle cx="58" cy="144" r="10"/>
+    <circle cx="88" cy="144" r="10"/>
+    <circle cx="118" cy="144" r="10"/>
+    <circle cx="148" cy="144" r="10" fill="#FFFFFF"/>
+  </g>
+</svg> 
