@@ -273,29 +273,85 @@
             transition: 0.3s;
         }
         .roster-page {
-            position: fixed;
-            top: 0;
-            left: 0;
+            position: relative;
             width: 100%;
-            height: 100%;
             background-color: white;
-            z-index: 90;
             padding: 20px;
             box-sizing: border-box;
-            display: none;
-            overflow-y: auto;
-        }
-        .roster-page.active {
-            display: block;
-        }
-        .roster-page h2 {
-            text-align: center;
-            margin: 40px 0 20px;
         }
         .roster-content {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0;
+        }
+        .roster-content h2 {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 24px;
+        }
+        .client-card {
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 10px;
+            transition: background-color 0.2s ease;
+        }
+        .client-card:hover {
+            background-color: #f0f0f0;
+        }
+        .client-card p {
+            flex: 1;
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .client-card h4 {
+            flex: 1;
+            margin: 0;
+            font-size: 16px;
+        }
+        .client-card .date {
+            width: 100px;
+            text-align: right;
+        }
+        .new-test-button {
+            display: block;
+            width: 200px;
+            margin: 0 auto 30px;
+            padding: 12px 24px;
+            background-color: #000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .new-test-button:hover {
+            background-color: #333;
+        }
+        .action-btn {
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+        .action-btn:hover {
+            background: #333;
+        }
+        #assessmentView {
+            display: none;
+        }
+        #assessmentView.active {
+            display: block;
         }
         .close-button {
             display: none;  /* Hide the close button */
@@ -370,22 +426,6 @@
         .saved-info-value {
             color: #000;
             font-weight: 500;
-        }
-        .new-test-button {
-            display: block;
-            width: 200px;
-            margin: 0 auto 30px;
-            padding: 10px 20px;
-            background-color: #000;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-        }
-        .new-test-button:hover {
-            background-color: #333;
         }
         .profile-history {
             margin-top: 40px;
@@ -487,12 +527,49 @@
         }
         @media (max-width: 600px) {
             body {
-                padding: 15px;
+                padding: 10px;
                 font-size: 14px;
             }
-            h1 {
-                font-size: 24px;
-                margin: 5px 0 20px 0;
+            .roster-content {
+                padding: 0;
+            }
+            .roster-content h2 {
+                font-size: 20px;
+                margin: 15px 0;
+            }
+            .client-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 12px;
+            }
+            .client-card p {
+                font-size: 13px;
+            }
+            .client-card h4 {
+                font-size: 15px;
+            }
+            .client-card .date {
+                width: auto;
+                text-align: left;
+            }
+            .client-card .actions {
+                width: 100%;
+                display: flex;
+                gap: 8px;
+                margin-top: 8px;
+            }
+            .action-btn {
+                flex: 1;
+                padding: 8px;
+                font-size: 13px;
+                text-align: center;
+            }
+            .new-test-button {
+                width: 100%;
+                margin: 15px 0 25px;
+                padding: 10px;
+                font-size: 15px;
             }
             .category {
                 flex-direction: column;
@@ -503,59 +580,34 @@
                 width: 32px;
                 height: 32px;
             }
-            #resultView > div {
-                margin: 0 20px;
-            }
-            .saved-info {
-                margin: 20px 20px 15px;
-            }
-            .saved-info-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            .client-card {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-                padding: 12px;
-            }
-            .client-card .date {
-                width: auto;
-                text-align: left;
-            }
-            .client-name-input {
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
-            .client-name-input input {
-                width: 100%;
-                max-width: 300px;
-            }
-            .client-name-input button {
-                width: 100%;
-                max-width: 300px;
-            }
-            #archetypeTitle {
-                font-size: 24px;
-            }
-            .roster-section {
+            #counter {
+                font-size: 15px;
                 margin: 20px 0;
             }
-            .roster-header {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .roster-header button {
-                width: 100%;
-            }
-            .action-buttons {
-                display: flex;
+            .buttons {
                 gap: 8px;
             }
-            .action-btn {
-                padding: 8px 12px;
-                font-size: 12px;
+            button {
+                padding: 10px;
+                font-size: 14px;
+            }
+            #archetypeTitle {
+                font-size: 22px;
+            }
+            #archetypeTagline {
+                font-size: 14px;
+            }
+            #archetypeDescription, #archetypeAdvice {
+                font-size: 14px;
+                line-height: 1.4;
+            }
+            .summary-section > div {
+                margin: 0;
+                padding: 15px 0;
+            }
+            #resultView > div {
+                margin: 0;
+                padding: 15px 0;
             }
         }
     </style>
@@ -753,35 +805,15 @@
             };
             window.totalPoints = 0;
             
-            // Set up event listeners for bubbles
-            document.querySelectorAll('.bubble').forEach(bubble => {
-                bubble.addEventListener('click', function() {
-                    const category = this.closest('.bubble-container').id.replace('-bubbles', '');
-                    const value = parseInt(this.getAttribute('data-value'));
-                    selectBubble(category, value, this);
-                });
-            });
-
-            // Set up event listener for reset button
-            document.querySelector('.buttons button:first-child').addEventListener('click', resetAll);
+            // Set up event listeners
+            setupEventListeners();
             
-            // Set up event listener for calculate button
-            document.getElementById('calculateBtn').addEventListener('click', calculate);
-
             // Initialize the roster display
             displayRosterClients();
-
-            // Show roster page by default
-            document.getElementById('rosterPage').classList.add('active');
+            
+            // Hide assessment view by default
             document.getElementById('assessmentView').classList.remove('active');
-
-            // Add global click handler for the roster
-            document.getElementById('rosterClients').addEventListener('click', function(e) {
-                // Prevent default behavior for action buttons
-                if (e.target.closest('.actions')) {
-                    e.stopPropagation();
-                }
-            });
+            document.getElementById('rosterPage').style.display = 'block';
 
             // Check for saved mode
             isClientMode = localStorage.getItem('isClientMode') === 'true';
@@ -794,6 +826,30 @@
                 }
             }
         });
+
+        function setupEventListeners() {
+            // Set up bubble click listeners
+            document.querySelectorAll('.bubble').forEach(bubble => {
+                bubble.addEventListener('click', function() {
+                    const category = this.closest('.bubble-container').id.replace('-bubbles', '');
+                    const value = parseInt(this.getAttribute('data-value'));
+                    selectBubble(category, value, this);
+                });
+            });
+
+            // Set up reset button listener
+            document.querySelector('.buttons button:first-child').addEventListener('click', resetAll);
+            
+            // Set up calculate button listener
+            document.getElementById('calculateBtn').addEventListener('click', calculate);
+
+            // Set up roster click handler
+            document.getElementById('rosterClients').addEventListener('click', function(e) {
+                if (e.target.closest('.actions')) {
+                    e.stopPropagation();
+                }
+            });
+        }
 
         // Select bubble function
         function selectBubble(category, value, clickedBubble) {
@@ -1240,8 +1296,8 @@
 
         // Add these new functions
         function toggleRoster() {
-            const rosterPage = document.getElementById('rosterPage');
-            rosterPage.classList.toggle('active');
+            document.getElementById('rosterPage').style.display = 'block';
+            document.getElementById('assessmentView').classList.remove('active');
             displayRosterClients();
         }
 
@@ -1266,31 +1322,19 @@
             // Reset all points and UI
             resetAll();
             
+            // Show assessment view
+            document.getElementById('assessmentView').classList.add('active');
+            document.getElementById('rosterPage').style.display = 'none';
+            
             // Show all input elements
             document.getElementById('counter').style.display = 'block';
             document.querySelector('.buttons').style.display = 'flex';
+            document.querySelector('.save-section').style.display = 'block';
             
-            // Only show save section in admin mode
-            document.querySelector('.save-section').style.display = isClientMode ? 'none' : 'block';
-            
-            // Hide the saved info section
-            document.getElementById('savedInfo').classList.remove('active');
-            
-            // Hide the results view
+            // Hide results
             document.getElementById('resultView').classList.add('hidden');
-            
-            // Hide the profile history
+            document.getElementById('savedInfo').classList.remove('active');
             document.getElementById('profileHistory').style.display = 'none';
-            
-            // Close the roster page if it's open
-            if (document.getElementById('rosterPage').classList.contains('active')) {
-                toggleRoster();
-            }
-            
-            // Show assessment view in client mode
-            if (isClientMode) {
-                document.getElementById('assessmentView').classList.add('active');
-            }
             
             // Scroll to top
             scrollToTop();
