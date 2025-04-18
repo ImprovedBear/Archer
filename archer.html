@@ -768,13 +768,12 @@
             // Set up event listener for calculate button
             document.getElementById('calculateBtn').addEventListener('click', calculate);
 
-            displaySavedClients();
-
-            // Make assessment view focusable
-            document.getElementById('assessmentView').setAttribute('tabindex', '-1');
-
             // Initialize the roster display
             displayRosterClients();
+
+            // Show roster page by default
+            document.getElementById('rosterPage').classList.add('active');
+            document.getElementById('assessmentView').classList.remove('active');
 
             // Add global click handler for the roster
             document.getElementById('rosterClients').addEventListener('click', function(e) {
@@ -793,8 +792,6 @@
                 if (currentClientName) {
                     showClientView(currentClientName);
                 }
-            } else {
-                document.getElementById('assessmentView').classList.add('active');
             }
         });
 
