@@ -502,7 +502,7 @@
         .client-name-input {
             text-align: center;
             margin: 20px 0 40px;
-            display: none;
+            display: block;
         }
         .client-mode .client-name-input {
             display: block;
@@ -513,7 +513,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             width: 300px;
-            margin-right: 10px;
+            margin-bottom: 15px;  /* Add space between input and button */
         }
         .client-name-input button {
             padding: 8px 16px;
@@ -523,6 +523,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            width: 300px;  /* Match input width for better mobile alignment */
         }
         .client-name-input button:hover {
             background: #333;
