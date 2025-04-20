@@ -493,40 +493,45 @@
         }
         .client-welcome {
             text-align: center;
-            margin: 40px 0;
-            display: none;
-        }
-        .client-mode .client-welcome {
+            margin: 40px 20px;  /* Add horizontal margin */
             display: block;
+        }
+        .client-welcome h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .client-welcome p {
+            color: #666;
+            line-height: 1.4;
+            margin: 0 auto;
+            max-width: 400px;  /* Limit text width for readability */
         }
         .client-name-input {
             text-align: center;
-            margin: 20px 0 40px;
-            display: block;
-        }
-        .client-mode .client-name-input {
+            margin: 20px;
             display: block;
         }
         .client-name-input input {
-            padding: 8px 16px;
+            padding: 12px 16px;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            width: 300px;
-            margin-bottom: 15px;  /* Add space between input and button */
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
         }
         .client-name-input button {
-            padding: 8px 16px;
+            padding: 12px 16px;
             font-size: 16px;
             background: #000;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            width: 300px;  /* Match input width for better mobile alignment */
-        }
-        .client-name-input button:hover {
-            background: #333;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
         }
         .assessment-area {
             display: none;
@@ -536,7 +541,7 @@
         }
         @media (max-width: 600px) {
             body {
-                padding: 10px;
+                padding: 15px;
                 font-size: 14px;
             }
             .roster-content {
@@ -617,6 +622,40 @@
             #resultView > div {
                 margin: 0;
                 padding: 15px 0;
+            }
+            .client-welcome {
+                margin: 20px 15px;
+            }
+            .client-welcome h2 {
+                font-size: 22px;
+            }
+            .client-name-input {
+                margin: 15px;
+            }
+            .client-name-input input,
+            .client-name-input button {
+                font-size: 15px;
+                padding: 10px 14px;
+            }
+        }
+        @media (max-width: 400px) {
+            .client-welcome h2 {
+                font-size: 20px;
+            }
+            .client-welcome p {
+                font-size: 14px;
+            }
+            .client-name-input input,
+            .client-name-input button {
+                max-width: 100%;  /* Full width on very small screens */
+            }
+        }
+        @media (min-width: 601px) {
+            .client-welcome {
+                margin: 60px 20px;
+            }
+            .client-welcome h2 {
+                font-size: 28px;
             }
         }
         /* Client-admin mode styles */
